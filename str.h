@@ -17,14 +17,33 @@ typedef struct {
     char data[];
 } stringHeader_t;
 
-#define string(input)                                               \
-    _Generic((typeof(input) _input = input),                        \
-        char *: stringFromPtr(_input),                              \
-        string: stringFromString(_input),                           \
-        default: static_assert(0, "type must be string or char *"),  \
-    )           
+#define coerce(_expr, type) ({                                              \
+    auto expr = (_expr);                                                    \
+    union {                                                                 \
+        typeof(expr) i_have_this;                                           \
+        type but_i_want_this;                                               \
+    } converter = { .i_have_this = expr };                                  \
+    converter.but_i_want_this;                                              \
+})
 
-string stringFromCharPtr(char *);
+#define string(input)                                                       \
+    ({                                                                      \
+        auto _input = (input);                                              \
+        static_assert( _Generic((_input),                                   \
+            char *: true,                                                   \
+            const char *: true,                                             \
+            string: true,                                                   \
+            default: false                                                  \
+        ), "input must be char * or string");                               \
+        _Generic((_input),                                                  \
+            char *: stringFromCharPtr(coerce(_input, char *)),              \
+            const char *: stringFromCharPtr(coerce(_input, const char *)),  \
+            string: stringFromString(coerce(_input, string))                \
+        );                                                                  \
+    })
+
+string stringFromCharPtr(const char *);
 string stringFromString(string);
+void destroyString(string input);
 
 #endif // _STR_H
