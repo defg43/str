@@ -35,11 +35,11 @@ bool test() {
     destroyString(haystack);
     destroyString(needle);
     
-    string str6 = string("helloß");
+    string str6 = string("helloßäöü");
     printf("before reversing: %s\n", str6);
     printf("->%s<-\n", stringReverse(str6));
     destroyString(str6);
-    
+    printf("::%c", 250);
     return true;
 }
 
