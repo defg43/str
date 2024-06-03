@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+typedef uint8_t byte;
 typedef struct {
     char first_char;
 } dataSegmentOfString_t;
@@ -77,5 +78,6 @@ size_t stringlen(string);
 size_t stringbytesalloced(string);
 bool stringeqlidx(string, size_t, string);
 string stringReverse(string);
+bool binaryPrefix(unsigned char, unsigned char, size_t);
 
 #endif // _STR_H

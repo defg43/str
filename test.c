@@ -1,6 +1,8 @@
 #include "str.h"
 #include <stdio.h>
 #include <stdbool.h>
+#include <assert.h>
+#include <string.h>
 
 bool test() {
     const char *str = "hello";
@@ -35,11 +37,14 @@ bool test() {
     destroyString(haystack);
     destroyString(needle);
     
-    string str6 = string("helloßäöü");
-    printf("before reversing: %s\n", str6);
-    printf("->%s<-\n", stringReverse(str6));
+    string str6 = string("世界!🌍😊éöñçїɔ㊙️⚛️🏳️‍🌈.");
+    string str7 = string(str6);
+    assert(stringeql(str7, stringReverse(stringReverse(str6))));
+    printf("%s\n", str6);
+    printf("%s\n", stringReverse(str6));
+    assert(0 != strcmp("㊙", "㊙️"));
     destroyString(str6);
-    printf("::%c", 250);
+    destroyString(str7);
     return true;
 }
 

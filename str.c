@@ -166,77 +166,48 @@ bool stringeqlidx(string haystack, size_t n, string needle) {
     return needle_matches;
 }
 
-// assume utf-8 is valid
-void reverseUtf8_char_old(string to_reverse) {
-    for(size_t index = 0; index < stringlen(to_reverse); index++) {
-        printf("current character is %08b, char: %c\n", 
-            to_reverse.at[index], to_reverse.at[index]);
-        if(to_reverse.at[index] < 128) { // normal ascii is not reversed
-            continue;       
-        }       
-        if(((to_reverse.at[index] & 0b1110000) == 0b11000000) && index + 1 < stringlen(to_reverse)) { // 2 byte
-            // swap byte with next byte
-            printf("detected 2 byte\n");
-            unsigned char temp = to_reverse.at[index];
-            to_reverse.at[index] = to_reverse.at[index + 1];
-            to_reverse.at[index + 1] = temp;
-            index += 1; 
-            continue;
-        }
-        if(((to_reverse.at[index] & 0b11110000) == 0b11100000) && index + 2 < stringlen(to_reverse)) { // 3 byte
-            // swap byte with next byte
-            printf("detected 3 byte\n");
-            unsigned char temp = to_reverse.at[index];
-            to_reverse.at[index] = to_reverse.at[index + 2];
-            to_reverse.at[index + 2] = temp;
-            index += 2; 
-            continue;
-        }
-        if(((to_reverse.at[index] & 0b11111000) == 0b11110000) && index + 3 < stringlen(to_reverse)) { // 4 byte
-            // swap byte with next byte
-            printf("detected 4 byte\n");
-            unsigned char temp = to_reverse.at[index];
-            to_reverse.at[index] = to_reverse.at[index + 3];
-            to_reverse.at[index + 3] = temp;
-            temp = to_reverse.at[index + 1];
-            to_reverse.at[index + 1] = to_reverse.at[index + 2];
-            to_reverse.at[index + 2] = temp;
-            index += 3; 
-            continue;
-        }
-    }   
-} 
-
+bool binaryPrefix(unsigned char to_check, unsigned char prefix, size_t depth) {
+    byte ones = 0b11111111;
+    byte mask = ones << (8 - depth);
+    byte result = to_check & mask;
+    bool matches = result == prefix;
+    #ifdef DEBUG
+    printf("to_check: %08b\nprefix:   %08b\nmask:     %08b\nresult:   %08b\nmatches:  %s\n", 
+        to_check, prefix, mask, result, matches ? "true" : "false");
+    #endif
+    return matches;
+}
 
 void reverseUtf8_char(char *to_reverse) {
     size_t index = 0;
     while (to_reverse[index] != '\0') {
-        printf("current character is %08x, char: %c\n", to_reverse[index], to_reverse[index]);
-        if ((unsigned char)to_reverse[index] < 0x80) { // normal ascii is not reversed
+        // printf("current character is %08x, char: %c\n", to_reverse[index], to_reverse[index]);
+        if (binaryPrefix(to_reverse[index], 0b00000000, 1)) { // normal ascii is not reversed
             index++;
             continue;
         }
-        if ((unsigned char)to_reverse[index] >= 0xc2 && (unsigned char)to_reverse[index] <= 0xdf && to_reverse[index + 1] != '\0') { // 2 byte
+        if (binaryPrefix(to_reverse[index], 0b11000000, 3) && to_reverse[index + 1] != '\0') {
             // swap byte with next byte
-            printf("detected 2 byte\n");
+            // printf("detected 2 byte\n");
             char temp = to_reverse[index];
             to_reverse[index] = to_reverse[index + 1];
             to_reverse[index + 1] = temp;
             index += 2;
             continue;
         }
-        if ((unsigned char)to_reverse[index] >= 0xe0 && (unsigned char)to_reverse[index] <= 0xef && to_reverse[index + 2] != '\0') { // 3 byte
+        if (
+            binaryPrefix(to_reverse[index], 0b11100000, 4) && to_reverse[index + 2] != '\0') { // 3 byte
             // swap byte with next byte
-            printf("detected 3 byte\n");
+            //printf("detected 3 byte\n");
             char temp = to_reverse[index];
             to_reverse[index] = to_reverse[index + 2];
             to_reverse[index + 2] = temp;
             index += 3;
             continue;
         }
-        if ((unsigned char)to_reverse[index] >= 0xf0 && (unsigned char)to_reverse[index] <= 0xf4 && to_reverse[index + 3] != '\0') { // 4 byte
+        if (binaryPrefix(to_reverse[index], 0b11110000, 5) && to_reverse[index + 3] != '\0') { // 4 byte
             // swap byte with next byte
-            printf("detected 4 byte\n");
+            // printf("detected 4 byte\n");
             char temp = to_reverse[index];
             to_reverse[index] = to_reverse[index + 3];
             to_reverse[index + 3] = temp;
@@ -252,7 +223,7 @@ void reverseUtf8_char(char *to_reverse) {
 
 // this is utf-8 aware
 string stringReverse(string input) {
-    reverseUtf8_char_old(input);
+    reverseUtf8_char(input.at);
     unsigned char temp;
     for(size_t i = 0, evil_i = stringlen(input); i < stringlen(input) / 2; i++, evil_i--) {
         temp = input.at[i];
