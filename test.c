@@ -53,7 +53,7 @@ bool test() {
     printf("%s\n", str10);
     destroyString(str10);
     string str11 = string("hello world, this is a test");
-    array(string) tokens = tokenize(str11, string(" "));
+    array(string) tokens = tokenizeStringFromCharPtr(str11, " ");
     for(size_t i = 0; i < tokens.count; i++) {
         printf("%s\n", tokens.element[i]);
     }
@@ -70,7 +70,18 @@ bool test() {
     return true;
 }
 
+bool test2() {
+	string str1 =  string("hello this is a test");
+	array(string) result = tokenizeStringFromCharPtr(str1, " ");
+	printf("original string: %s\n", str1);
+	destroyString(str1);
+	printf("printing tokens:\n");
+	for(size_t i = 0; i < result.count; i++) {
+		printf("element %ld: %s\n", i, result.element[i]);
+	}
+}
+
 int main() {
-    test();
+    test2();
     return 0;
 }

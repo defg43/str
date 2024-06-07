@@ -341,7 +341,50 @@ array(string) tokenizeString(string input, string delimiter) {
 }
 
 array(string) tokenizeStringFromCharPtr(string input, char *delimiter) {
+	size_t index = 0;
+	size_t slice_start = 0;
+	size_t len = stringlen(input);
+	array(string) ret = { .element = NULL, .count = 0 };
+	while(input.at[index]) {
+		if(input.at[index] == delimiter[0]) {
+			string substr = sliceFromCharPtr(input.at, slice_start, index);
+			index++;
+			slice_start = index;
+			if(ret.count == 0) {
+				ret.element = malloc(sizeof(string));
+				ret.element[ret.count] = substr;
+				ret.count = 1;
+			} else {
+				ret.element = 
+				realloc(ret.element, sizeof(string) * (ret.count + 1));
+				ret.element[ret.count] = substr;
+				ret.count++;
+			} 
+		} else {
+			index++;
+		} 
+		// put the remainder into the last token
+		if(input.at[index + 1] == '\0' && slice_start != len && index != len) {
+			string last_token = sliceFromCharPtr(input.at, slice_start, len);
+			if(ret.count == 0) {
+				ret.element = malloc(sizeof(string));
+				ret.element[ret.count] = last_token;
+				ret.count = 1;
+			} else {
+				ret.element = 
+				realloc(ret.element, sizeof(string) * (ret.count + 1));
+				ret.element[ret.count] = last_token;
+				ret.count++;
+			}
+		}
+	}
+	return ret;
+}
+
+
+array(string) tokenizeStringFromCharPtr_old(string input, char *delimiter) { 
     printf("eeeeeeeeeeeeeeeee\n");
+    printf("the string to be tokenized is %s", input);
     string *tokens = NULL;
     size_t len = strlen(delimiter);
     for(size_t index = 0; index < stringlen(input); index++) {
@@ -359,6 +402,7 @@ array(string) tokenizeStringFromCharPtr(string input, char *delimiter) {
                 array(string) ret = (array(string)) { .element = tokens, .count = 1 };
                 ret.element = realloc(ret.element, (ret.count + 1) * sizeof(string));
                 ret.element[ret.count++] = token;
+                printf("the count is %ld", ret.count);
                 return ret;
             }
             index += len - 1;
