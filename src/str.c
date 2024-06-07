@@ -1,4 +1,4 @@
-#include "str.h"
+#include "../include/str.h"
 #include <stddef.h>
 #include <stdio.h>
 
@@ -30,7 +30,7 @@ static size_t strlen(const char *str) {
 
 string stringFromCharPtr(const char *input) {
     size_t len = strlen(input);
-    size_t to_allocate = sizeof(stringHeader_t) + len; 
+    size_t to_allocate = sizeof(stringHeader_t) + len + 1; 
     stringHeader_t *result = malloc(to_allocate);
     if(!result) {
         fprintf(stderr, "failed to allocate memory in stringFromCharPtr\n");
@@ -95,13 +95,6 @@ stringHeader_t *getHeaderPointer(string input) {
     return containerof(input.data, stringHeader_t, data);
 }
 
-array(string) tokenizeString(string input, string delimiter) {
-    for(size_t i = 0; i < stringlen(input); i++) {  
-
-        
-    }
-}
-
 int stringcmp(string a, string b) {
     stringHeader_t *a_header = getHeaderPointer(a);
     stringHeader_t *b_header = getHeaderPointer(b);
@@ -130,6 +123,22 @@ int stringncmp(string a, string b, size_t n) {
         }
     }
     return a_header->length - b_header->length;
+}
+
+bool strneql(char *a, size_t n, char *b) {
+    size_t len_a = strlen(a);
+    size_t len_b = strlen(b);
+    if((n > len_a) || (len_b > len_a - n)) {
+        return false;
+    }
+    bool matches = true;
+    for(size_t i = 0; i < len_a; i++) {
+        matches = (a[i] == b[i]) && matches;
+        if(!matches) {
+            return false;
+        }
+    }
+    return matches;
 }
 
 bool stringeql(string a, string b) {
@@ -232,4 +241,129 @@ string stringReverse(string input) {
     }
     // pass over the input and reverse backwards utf8 characters
     return input;
+}
+
+string sliceFromString(string input, size_t start, size_t end) {
+    bool needs_reversing = false;
+    if(input.data == NULL) {
+        return (string) { .data = NULL };
+    }
+    if(end > stringlen(input)) {
+        if(start > stringlen(input)) {
+            return (string) { .data = NULL };
+        }
+    } else if(start > end) {
+        needs_reversing = true;
+        size_t temp = start;
+        start = end;
+        end = temp;
+    }
+    if(start > stringlen(input)) {
+        if(!needs_reversing)   {
+            return (string) { .data = NULL };
+        } else {
+            start = stringlen(input);
+        }
+    }
+    size_t to_allocate = end - start;
+    stringHeader_t *buf = malloc(sizeof(stringHeader_t) + to_allocate + 1);
+    for(size_t index = 0; index < to_allocate; index++) {
+        buf->data[index] = input.at[start + index];
+    }
+    buf->data[to_allocate] = '\0';
+    string ret = (string) { .data = (dataSegmentOfString_t *)buf->data };
+    if(needs_reversing) {
+        stringReverse(ret);
+    }
+    return ret;
+}
+
+string sliceFromCharPtr(const char *input, size_t start, size_t end) {
+    size_t len = strlen(input);
+    bool needs_reversing = false;
+    if(input == NULL) {
+        return (string) { .data = NULL };
+    }
+    if(end > len) {
+        if(start > len) {
+            return (string) { .data = NULL };
+        }
+    } else if(start > end) {
+        needs_reversing = true;
+        size_t temp = start;
+        start = end;
+        end = temp;
+    }
+    if(start > len) {
+        if(!needs_reversing)   {
+            return (string) { .data = NULL };
+        } else {
+            start = len;
+        }
+    }
+    size_t to_allocate = end - start;
+    stringHeader_t *buf = malloc(sizeof(stringHeader_t) + to_allocate + 1);
+    for(size_t index = 0; index < to_allocate; index++) {
+        buf->data[index] = input[start + index];
+    }
+    buf->data[to_allocate] = '\0';
+    string ret = (string) { .data = (dataSegmentOfString_t *)buf->data };
+    if(needs_reversing) {
+        stringReverse(ret);
+    }
+    return ret;
+}
+
+array(string) tokenizeString(string input, string delimiter) {
+    string *tokens = NULL;
+    for(size_t index = 0; index < stringlen(input); index++) {
+        if(stringeqlidx(input, index, delimiter)) {
+            stringHeader_t *buf = malloc(sizeof(stringHeader_t) + index + 1);
+            for(size_t token_index = 0; token_index < index; token_index++) {
+                buf->data[token_index] = input.at[token_index];
+            }
+            buf->data[index] = '\0';
+            string token = (string) { .data = (dataSegmentOfString_t *)buf->data };
+            if(tokens == NULL) {
+                tokens = malloc(sizeof(string) * 1);
+                tokens[0] = token;
+            } else {
+                array(string) ret = (array(string)) { .element = tokens, .count = 1 };
+                ret.element = realloc(ret.element, (ret.count + 1) * sizeof(string));
+                ret.element[ret.count++] = token;
+                return ret;
+            }
+            index++;
+        }        
+    }
+    array(string) ret = (array(string)) { .element = tokens, .count = 0 };
+    return ret;
+}
+
+array(string) tokenizeStringFromCharPtr(string input, char *delimiter) {
+    printf("eeeeeeeeeeeeeeeee\n");
+    string *tokens = NULL;
+    size_t len = strlen(delimiter);
+    for(size_t index = 0; index < stringlen(input); index++) {
+        if(strneql((char *)input.data, index, delimiter)) {
+            stringHeader_t *buf = malloc(sizeof(stringHeader_t) + index + 1);
+            for(size_t token_index = 0; token_index < index; token_index++) {
+                buf->data[token_index] = input.at[token_index];
+            }
+            buf->data[index] = '\0';
+            string token = (string) { .data = (dataSegmentOfString_t *)buf->data };
+            if(tokens == NULL) {
+                tokens = malloc(sizeof(string) * 1);
+                tokens[0] = token;
+            } else {
+                array(string) ret = (array(string)) { .element = tokens, .count = 1 };
+                ret.element = realloc(ret.element, (ret.count + 1) * sizeof(string));
+                ret.element[ret.count++] = token;
+                return ret;
+            }
+            index += len - 1;
+        }
+    }
+    array(string) ret = (array(string)) { .element = tokens, .count = 0 };
+    return ret;
 }

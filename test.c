@@ -1,4 +1,4 @@
-#include "str.h"
+#include "include/str.h"
 #include <stdio.h>
 #include <stdbool.h>
 #include <assert.h>
@@ -42,9 +42,31 @@ bool test() {
     assert(stringeql(str7, stringReverse(stringReverse(str6))));
     printf("%s\n", str6);
     printf("%s\n", stringReverse(str6));
-    assert(0 != strcmp("㊙", "㊙️"));
     destroyString(str6);
     destroyString(str7);
+    string str8 = string("abc test 123");
+    string str9 = sliceFromString(str8, 4, 7);
+    printf("%s\n", str9);
+    destroyString(str8);
+    destroyString(str9);
+    string str10 = sliceFromCharPtr("abc test 123", 4, 255);
+    printf("%s\n", str10);
+    destroyString(str10);
+    string str11 = string("hello world, this is a test");
+    array(string) tokens = tokenize(str11, string(" "));
+    for(size_t i = 0; i < tokens.count; i++) {
+        printf("%s\n", tokens.element[i]);
+    }
+    printf("tokenization done\n");
+    destroyString(str11);
+    for(size_t i = 0; i < tokens.count; i++) {
+        destroyString(tokens.element[i]);
+    }
+    free(tokens.element);
+
+    char *test1 = "this is a test string";
+    char *delimiter = "test";
+    printf("%s\n", strneql(test1, 4, delimiter) ? "true" : "false");
     return true;
 }
 

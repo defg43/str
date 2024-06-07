@@ -61,9 +61,7 @@ typedef struct {
         );                                                                  \
     })
 
-#define array(type) struct array##type { type *arr; size_t count; }
-
-array(string) tokenizeString(string, string);
+#define array(type) struct array_##type { type *element; size_t count; }
 
 string stringFromCharPtr(const char *);
 string stringFromString(string);
@@ -74,10 +72,27 @@ int stringcmp(string, string);
 int stringncmp(string, string, size_t);
 bool stringeql(string, string);
 bool stringneql(string, string, size_t);
+bool strneql(char *, size_t, char *);
 size_t stringlen(string);
 size_t stringbytesalloced(string);
 bool stringeqlidx(string, size_t, string);
 string stringReverse(string);
 bool binaryPrefix(unsigned char, unsigned char, size_t);
+string sliceFromString(string, size_t, size_t);
+string sliceFromCharPtr(const char *, size_t, size_t);
+array(string) tokenizeString(string, string);
+array(string) tokenizeStringFromCharPtr(string, char *);
+array(string) tokenizeStringbyDelimiters(string, array(string));
+
+#define tokenize(s, delimiter)                                                  \
+    ({                                                                          \
+        auto _delimiter = (delimiter);                                          \   
+        _Generic((_delimiter),                                                  \
+            string:                                                             \
+                tokenizeString(s, coerce( _delimiter, string)),                 \
+            char *:                                                             \
+                tokenizeStringFromCharPtr(s, coerce( _delimiter, char *))       \
+        );                                                                      \
+    })
 
 #endif // _STR_H
