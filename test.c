@@ -52,33 +52,21 @@ bool test() {
     string str10 = sliceFromCharPtr("abc test 123", 4, 255);
     printf("%s\n", str10);
     destroyString(str10);
-    string str11 = string("hello world, this is a test");
-    array(string) tokens = tokenizeStringFromCharPtr(str11, " ");
-    for(size_t i = 0; i < tokens.count; i++) {
-        printf("%s\n", tokens.element[i]);
-    }
-    printf("tokenization done\n");
-    destroyString(str11);
-    for(size_t i = 0; i < tokens.count; i++) {
-        destroyString(tokens.element[i]);
-    }
-    free(tokens.element);
-
-    char *test1 = "this is a test string";
-    char *delimiter = "test";
-    printf("%s\n", strneql(test1, 4, delimiter) ? "true" : "false");
     return true;
 }
 
 bool test2() {
-	string str1 =  string("hello this is a test");
-	array(string) result = tokenizeStringFromCharPtr(str1, " ");
-	printf("original string: %s\n", str1);
-	destroyString(str1);
-	printf("printing tokens:\n");
-	for(size_t i = 0; i < result.count; i++) {
-		printf("element %ld: %s\n", i, result.element[i]);
-	}
+    array(string) tokens = tokenize("hello world, this is a test", " ");
+    printf("the count is %ld\n", tokens.count);
+    for(size_t i = 0; i < tokens.count; i++) {
+        printf("el. %ld : %s\n", tokens.count, tokens.element[i]);
+    }
+    printf("tokenization done\n");
+    for(size_t i = 0; i < tokens.count; i++) {
+        destroyString(tokens.element[i]);
+    }
+    free(tokens.element);
+    return true;
 }
 
 int main() {

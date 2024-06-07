@@ -63,36 +63,51 @@ typedef struct {
 
 #define array(type) struct array_##type { type *element; size_t count; }
 
+#define push(arr, elem) ({                                                  \
+    auto _arr = &(arr);                                                     \
+    auto _elem = (elem);                                                    \
+    _arr->element =                                                         \
+        realloc(_arr->element, sizeof(_arr->element) * (_arr->count + 1));  \
+    printf("pushing element to array\n");                                   \
+    _arr->element[_arr->count] = _elem;                                     \
+    _arr->count++;                                                          \
+})
+
+#define pop(arr) ({                                                         \
+    auto _arr = &(arr);                                                     \
+    auto ret = _arr->element[_arr->count - 1];                              \
+    _arr->count--;                                                          \
+    _arr->element =                                                         \
+        realloc(_arr->element, sizeof(_arr->element) * _arr->count);        \
+    ret;                                                                    \
+})
+
+
 string stringFromCharPtr(const char *);
 string stringFromString(string);
-void destroyString(string);
-string concat(string, string);
 stringHeader_t *getHeaderPointer(string);
+void destroyString(string);
+size_t stringlen(string);
+size_t stringbytesalloced(string);
+
 int stringcmp(string, string);
 int stringncmp(string, string, size_t);
 bool stringeql(string, string);
 bool stringneql(string, string, size_t);
-bool strneql(char *, size_t, char *);
-size_t stringlen(string);
-size_t stringbytesalloced(string);
+bool strneql(char *, char *, size_t);
 bool stringeqlidx(string, size_t, string);
-string stringReverse(string);
-bool binaryPrefix(unsigned char, unsigned char, size_t);
+
+
 string sliceFromString(string, size_t, size_t);
 string sliceFromCharPtr(const char *, size_t, size_t);
-array(string) tokenizeString(string, string);
-array(string) tokenizeStringFromCharPtr(string, char *);
-array(string) tokenizeStringbyDelimiters(string, array(string));
 
-#define tokenize(s, delimiter)                                                  \
-    ({                                                                          \
-        auto _delimiter = (delimiter);                                          \   
-        _Generic((_delimiter),                                                  \
-            string:                                                             \
-                tokenizeString(s, coerce( _delimiter, string)),                 \
-            char *:                                                             \
-                tokenizeStringFromCharPtr(s, coerce( _delimiter, char *))       \
-        );                                                                      \
-    })
+string concat(string, string);
+string stringReverse(string);
 
-#endif // _STR_H
+bool binaryPrefix(unsigned char, unsigned char, size_t);
+
+array(string) tokenizeString(char *, char *);
+
+#define tokenize(str, delim) tokenizeString(coerce(str, char *), coerce(delim, char *))
+
+#endif // _STR_H_

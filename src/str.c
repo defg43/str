@@ -125,20 +125,13 @@ int stringncmp(string a, string b, size_t n) {
     return a_header->length - b_header->length;
 }
 
-bool strneql(char *a, size_t n, char *b) {
-    size_t len_a = strlen(a);
-    size_t len_b = strlen(b);
-    if((n > len_a) || (len_b > len_a - n)) {
-        return false;
-    }
-    bool matches = true;
-    for(size_t i = 0; i < len_a; i++) {
-        matches = (a[i] == b[i]) && matches;
-        if(!matches) {
+bool strneql(char *a, char *b, size_t n) {
+    for(size_t i = 0; i < n; i++) {
+        if(a[i] == '\0' || b[i] == '\0' || a[i] != b[i]) {
             return false;
         }
     }
-    return matches;
+    return true;
 }
 
 bool stringeql(string a, string b) {
@@ -314,7 +307,7 @@ string sliceFromCharPtr(const char *input, size_t start, size_t end) {
     return ret;
 }
 
-array(string) tokenizeString(string input, string delimiter) {
+array(string) tokenizeString_old(string input, string delimiter) {
     string *tokens = NULL;
     for(size_t index = 0; index < stringlen(input); index++) {
         if(stringeqlidx(input, index, delimiter)) {
@@ -340,74 +333,26 @@ array(string) tokenizeString(string input, string delimiter) {
     return ret;
 }
 
-array(string) tokenizeStringFromCharPtr(string input, char *delimiter) {
-	size_t index = 0;
-	size_t slice_start = 0;
-	size_t len = stringlen(input);
-	array(string) ret = { .element = NULL, .count = 0 };
-	while(input.at[index]) {
-		if(input.at[index] == delimiter[0]) {
-			string substr = sliceFromCharPtr(input.at, slice_start, index);
-			index++;
-			slice_start = index;
-			if(ret.count == 0) {
-				ret.element = malloc(sizeof(string));
-				ret.element[ret.count] = substr;
-				ret.count = 1;
-			} else {
-				ret.element = 
-				realloc(ret.element, sizeof(string) * (ret.count + 1));
-				ret.element[ret.count] = substr;
-				ret.count++;
-			} 
-		} else {
-			index++;
-		} 
-		// put the remainder into the last token
-		if(input.at[index + 1] == '\0' && slice_start != len && index != len) {
-			string last_token = sliceFromCharPtr(input.at, slice_start, len);
-			if(ret.count == 0) {
-				ret.element = malloc(sizeof(string));
-				ret.element[ret.count] = last_token;
-				ret.count = 1;
-			} else {
-				ret.element = 
-				realloc(ret.element, sizeof(string) * (ret.count + 1));
-				ret.element[ret.count] = last_token;
-				ret.count++;
-			}
-		}
-	}
-	return ret;
-}
-
-
-array(string) tokenizeStringFromCharPtr_old(string input, char *delimiter) { 
-    printf("eeeeeeeeeeeeeeeee\n");
-    printf("the string to be tokenized is %s", input);
-    string *tokens = NULL;
-    size_t len = strlen(delimiter);
-    for(size_t index = 0; index < stringlen(input); index++) {
-        if(strneql((char *)input.data, index, delimiter)) {
-            stringHeader_t *buf = malloc(sizeof(stringHeader_t) + index + 1);
-            for(size_t token_index = 0; token_index < index; token_index++) {
-                buf->data[token_index] = input.at[token_index];
-            }
-            buf->data[index] = '\0';
-            string token = (string) { .data = (dataSegmentOfString_t *)buf->data };
-            if(tokens == NULL) {
-                tokens = malloc(sizeof(string) * 1);
-                tokens[0] = token;
-            } else {
-                array(string) ret = (array(string)) { .element = tokens, .count = 1 };
-                ret.element = realloc(ret.element, (ret.count + 1) * sizeof(string));
-                ret.element[ret.count++] = token;
-                printf("the count is %ld", ret.count);
-                return ret;
-            }
-            index += len - 1;
-        }
+array(string) tokenizeString(char *input, char *delim) {
+    if(!input || !delim) {
+        return (array(string)) { .element = NULL, .count = 0 };
     }
-    array(string) ret = (array(string)) { .element = tokens, .count = 0 };
+    size_t input_index = 0, delim_index = 0, marker = 0;
+    bool found = false, delim_matches = true;
+    string token = {};
+    array(string) ret = {};
+    while(input[input_index]) {
+        delim_matches = input[input_index] == delim[delim_index];
+        found = !delim[delim_index];
+        delim_index++;
+        delim_index *= delim_matches;
+        if(found) {
+            token = sliceFromCharPtr(input, marker, input_index);
+            printf(token.at);
+            marker = input_index;
+            push(ret, token);
+        }
+        input_index++;
+    }
     return ret;
 }
