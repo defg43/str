@@ -97,12 +97,17 @@ bool stringneql(string, string, size_t);
 bool strneql(char *, char *, size_t);
 bool stringeqlidx(string, size_t, string);
 
-
+// those allocate a new string
 string sliceFromString(string, size_t, size_t);
 string sliceFromCharPtr(const char *, size_t, size_t);
 
+// these do not
 string concat(string, string);
 string stringReverse(string);
+// string stringUppercase(string);
+// string stringUppercaseRange(string, size_t, size_t);
+// string stringLowercase(string);
+// string stringLowercaseRange(string, size_t, size_t);
 
 bool binaryPrefix(unsigned char, unsigned char, size_t);
 

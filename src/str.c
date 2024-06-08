@@ -327,7 +327,7 @@ array(string) tokenizeString_old(string input, string delimiter) {
                 return ret;
             }
             index++;
-        }        
+        }
     }
     array(string) ret = (array(string)) { .element = tokens, .count = 0 };
     return ret;
@@ -348,7 +348,6 @@ array(string) tokenizeString(char *input, char *delim) {
         delim_index *= delim_matches;
         if(found) {
             token = sliceFromCharPtr(input, marker, input_index);
-            printf(token.at);
             marker = input_index;
             push(ret, token);
         }
