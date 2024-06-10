@@ -26,16 +26,6 @@ typedef struct {
     char data[];
 } stringHeader_t;
 
-typedef struct {
-    union {
-        void *data;
-        void *at;
-    };
-    size_t allocated_bytes;
-    size_t element_size;
-    size_t length;
-} array_t;
-
 #define coerce(_expr, type) ({                                              \
     auto expr = (_expr);                                                    \
     union {                                                                 \
