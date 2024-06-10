@@ -1,6 +1,7 @@
 #include "../include/str.h"
 #include <stddef.h>
 #include <stdio.h>
+#include <assert.h>
 
 #ifndef container_of
 #define container_of(ptr, type, member) ((type *)((size_t)ptr - offsetof(type, member)))
@@ -16,10 +17,11 @@ static char *strcpy(const char *src, char *dest) {
     return dest;
 }
 
-static char *strncpy(const char *src, char *dest, size_t n) {
+static char *strncpy(char *dest, const char *src, size_t n) {
+    char *orig = dest;
     if(src + (size_t)dest == src - (size_t)dest) return NULL;
     while(n-- && (*dest++ = *src++));
-    return dest;
+    return orig;
 }
 
 static size_t strlen(const char *str) {
@@ -353,5 +355,53 @@ array(string) tokenizeString(char *input, char *delim) {
         }
         input_index++;
     }
+    return ret;
+}
+
+string stringGrowBuffer(string orig, size_t to_add) {
+    stringHeader_t *hdr = getHeaderPointer(orig);
+    size_t old_bytes = stringbytesalloced(orig);
+    stringHeader_t *new_hdr = realloc(hdr, old_bytes + to_add + 512);
+    if(new_hdr == NULL) {
+        fprintf(stderr, "realloc failed in stringGrowBuffer\n");
+        exit(EXIT_FAILURE);
+    }
+    new_hdr->allocated_bytes += to_add;
+    new_hdr->data[new_hdr->length + to_add] = '\0'; // preadd null terminator
+    return (string) { .data = (dataSegmentOfString_t *)new_hdr->data };
+}
+
+string appendCharPtr(string orig, const char *to_append) {
+    string ret = stringGrowBuffer(orig, strlen(to_append));
+    strncpy(ret.at + stringlen(ret), to_append, strlen(to_append));
+    getHeaderPointer(ret)->length += strlen(to_append);
+    assert(stringlen(ret) == strlen(ret.at));
+    return ret;
+}
+
+string appendString(string orig, string to_append) {
+    string ret = stringGrowBuffer(orig, stringlen(to_append));
+    // ret at this point still has the old string length
+    strncpy(ret.at + stringlen(ret), to_append.at, stringlen(to_append));
+    getHeaderPointer(ret)->length += stringlen(to_append);
+    assert(stringlen(ret) == strlen(ret.at));
+    return ret;
+}
+
+string prependCharPtr(string orig, const char *to_prepend) {
+    string ret = stringGrowBuffer(orig, strlen(to_prepend));
+    strncpy(ret.at, to_prepend, strlen(to_prepend));
+    strncpy(ret.at + strlen(to_prepend), orig.at, stringlen(orig));
+    getHeaderPointer(ret)->length += strlen(to_prepend);
+    assert(stringlen(ret) == strlen(ret.at));
+    return ret;
+}
+
+string prependString(string orig, string to_prepend) {
+    string ret = stringGrowBuffer(orig, stringlen(to_prepend));
+    strncpy(ret.at, to_prepend.at, stringlen(to_prepend));
+    strncpy(ret.at + stringlen(to_prepend), orig.at, stringlen(orig));
+    getHeaderPointer(ret)->length += stringlen(to_prepend);
+    assert(stringlen(ret) == strlen(ret.at));
     return ret;
 }

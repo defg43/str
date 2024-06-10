@@ -100,10 +100,17 @@ bool stringeqlidx(string, size_t, string);
 // those allocate a new string
 string sliceFromString(string, size_t, size_t);
 string sliceFromCharPtr(const char *, size_t, size_t);
-
-// these do not
 string concat(string, string);
+
+// these operate on the existing string
 string stringReverse(string);
+
+// these modify the original buffer
+string stringGrowBuffer(string, size_t);
+string appendCharPtr(string, const char *);
+string appendString(string, string);
+string prependCharPtr(string, const char *);
+string prepend(string, string);
 // string stringUppercase(string);
 // string stringUppercaseRange(string, size_t, size_t);
 // string stringLowercase(string);
@@ -114,5 +121,22 @@ bool binaryPrefix(unsigned char, unsigned char, size_t);
 array(string) tokenizeString(char *, char *);
 
 #define tokenize(str, delim) tokenizeString(coerce(str, char *), coerce(delim, char *))
-
+#define append(str, to_append_)                                                         \
+    ({                                                                                  \
+        auto to_append = (to_append_);                                                  \
+        _Generic((to_append),                                                           \
+            const char *: appendCharPtr(str, coerce(to_append, const char *)),          \
+            char *: appendCharPtr(str, coerce(to_append, char *)),                      \
+            string: appendString(str, coerce(to_append, string))                        \
+        );                                                                              \
+    })
+#define prepend(str, to_prepend_)                                                       \
+    ({                                                                                  \
+        auto to_prepend = (to_prepend_);                                                \
+        _Generic((to_prepend),                                                          \
+            const char *: prependCharPtr(str, coerce(to_prepend, const char *)),        \
+            char *: prependCharPtr(str, coerce(to_prepend, char *)),                    \
+            string: prependString(str, coerce(to_prepend, string))                      \
+        );                                                                              \
+    })
 #endif // _STR_H_

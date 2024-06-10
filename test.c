@@ -69,7 +69,16 @@ bool test2() {
     return true;
 }
 
+bool test3() {
+    string str = string("hello");
+    str = append(str, " world");
+    printf("%ld\n", stringbytesalloced(str));
+    printf("%s\n", str);
+    destroyString(str);
+    return true;
+}
+
 int main() {
-    test2();
+    test3();
     return 0;
 }
