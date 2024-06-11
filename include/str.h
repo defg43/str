@@ -116,8 +116,8 @@ array(string) tokenizeString(char *, char *);
         auto to_append = (to_append_);                                                  \
         _Generic((to_append),                                                           \
             const char *: appendCharPtr(str, coerce(to_append, const char *)),          \
-            char *: appendCharPtr(str, coerce(to_append, char *)),                      \
-            string: appendString(str, coerce(to_append, string))                        \
+            char *:       appendCharPtr(str, coerce(to_append, char *)),                \
+            string:       appendString(str, coerce(to_append, string))                  \
         );                                                                              \
     })
 #define prepend(str, to_prepend_)                                                       \
@@ -125,8 +125,8 @@ array(string) tokenizeString(char *, char *);
         auto to_prepend = (to_prepend_);                                                \
         _Generic((to_prepend),                                                          \
             const char *: prependCharPtr(str, coerce(to_prepend, const char *)),        \
-            char *: prependCharPtr(str, coerce(to_prepend, char *)),                    \
-            string: prependString(str, coerce(to_prepend, string))                      \
+            char *:       prependCharPtr(str, coerce(to_prepend, char *)),              \
+            string:       prependString(str, coerce(to_prepend, string))                \
         );                                                                              \
     })
 #endif // _STR_H_

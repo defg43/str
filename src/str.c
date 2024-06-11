@@ -359,9 +359,12 @@ array(string) tokenizeString(char *input, char *delim) {
 }
 
 string stringGrowBuffer(string orig, size_t to_add) {
+    if(orig.data == NULL) {
+        orig = string("");
+    }
     stringHeader_t *hdr = getHeaderPointer(orig);
     size_t old_bytes = stringbytesalloced(orig);
-    stringHeader_t *new_hdr = realloc(hdr, old_bytes + to_add);
+   stringHeader_t *new_hdr = realloc(hdr, old_bytes + to_add);
     if(new_hdr == NULL) {
         fprintf(stderr, "realloc failed in stringGrowBuffer\n");
         exit(EXIT_FAILURE);

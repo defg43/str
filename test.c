@@ -75,6 +75,13 @@ bool test3() {
     printf("%ld\n", stringbytesalloced(str));
     printf("%s\n", str);
     destroyString(str);
+
+    string empty = { NULL };
+    // printf("the empty string without initing is %s\n", empty);
+    empty = append(empty, "foobarbaz");
+    printf("%ld\n", stringbytesalloced(empty));
+    printf("%s\n", empty);
+    destroyString(empty);
     return true;
 }
 
