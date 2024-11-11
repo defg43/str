@@ -127,6 +127,18 @@ int stringncmp(string a, string b, size_t n) {
     return a_header->length - b_header->length;
 }
 
+bool streql(char *a, char *b) {
+	size_t i = 0;
+	while(a[i] != '\0' && b[i] != '\0') {
+		if(a[i] == b[i]) {
+			i++;
+			continue;	
+		}
+		return false;
+	}
+    return true;
+}
+
 bool strneql(char *a, char *b, size_t n) {
     for(size_t i = 0; i < n; i++) {
         if(a[i] == '\0' || b[i] == '\0' || a[i] != b[i]) {
@@ -266,6 +278,7 @@ string sliceFromString(string input, size_t start, size_t end) {
         buf->data[index] = input.at[start + index];
     }
     buf->data[to_allocate] = '\0';
+	buf->length = (end - start) > 0 ? (end - start) : (start - end);
     string ret = (string) { .data = (dataSegmentOfString_t *)buf->data };
     if(needs_reversing) {
         stringReverse(ret);

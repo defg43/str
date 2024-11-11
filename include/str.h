@@ -84,6 +84,7 @@ int stringcmp(string, string);
 int stringncmp(string, string, size_t);
 bool stringeql(string, string);
 bool stringneql(string, string, size_t);
+bool streql(char *, char *);
 bool strneql(char *, char *, size_t);
 bool stringeqlidx(string, size_t, string);
 
