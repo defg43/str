@@ -349,27 +349,36 @@ array(string) tokenizeString_old(string input, string delimiter) {
 }
 
 array(string) tokenizeString(char *input, char *delim) {
-    if(!input || !delim) {
+    if (!input || !delim) {
         return (array(string)) { .element = NULL, .count = 0 };
     }
     size_t input_index = 0, delim_index = 0, marker = 0;
     bool found = false, delim_matches = true;
     string token = {};
     array(string) ret = {};
-    while(input[input_index]) {
+
+    while (input[input_index]) {
         delim_matches = input[input_index] == delim[delim_index];
         found = !delim[delim_index];
         delim_index++;
         delim_index *= delim_matches;
-        if(found) {
+
+        if (found) {
             token = sliceFromCharPtr(input, marker, input_index);
-            marker = input_index;
             push(ret, token);
+            marker = input_index; 
         }
         input_index++;
     }
+
+    if (marker < input_index) {
+        token = sliceFromCharPtr(input, marker, input_index);
+        push(ret, token);
+    }
+
     return ret;
 }
+
 
 string stringGrowBuffer(string orig, size_t to_add) {
     if(orig.data == NULL) {
