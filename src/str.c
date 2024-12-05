@@ -421,3 +421,13 @@ string prependString(string orig, string to_prepend) {
     assert(stringlen(ret) == strlen(ret.at));
     return ret;
 }
+
+bool iterstringReset(iterstring_t str) {
+	str.index = str.previous;
+	return true;	
+}
+
+bool iterstringAdvance(iterstring_t str) {
+	str.previous = str.index;
+	return true;
+}

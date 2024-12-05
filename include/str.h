@@ -26,6 +26,12 @@ typedef struct {
     char data[];
 } stringHeader_t;
 
+typedef struct {
+	size_t previous;
+	size_t index;
+	string str;		
+} iterstring_t;
+
 #define coerce(_expr, type) ({                                              \
     auto expr = (_expr);                                                    \
     union {                                                                 \
@@ -102,6 +108,10 @@ string appendCharPtr(string, const char *);
 string appendString(string, string);
 string prependCharPtr(string, const char *);
 string prepend(string, string);
+
+bool iterstringReset(iterstring_t str);
+bool iterstringAdvance(iterstring_t str);
+
 // string stringUppercase(string);
 // string stringUppercaseRange(string, size_t, size_t);
 // string stringLowercase(string);
