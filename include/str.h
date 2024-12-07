@@ -120,6 +120,7 @@ bool iterstringAdvance(iterstring_t str);
 bool binaryPrefix(unsigned char, unsigned char, size_t);
 
 array(string) tokenizeString(char *, char *);
+array(string) tokenizePairwiseString(char *, char *, char *);
 
 #define tokenize(str, delim) tokenizeString(coerce(str, char *), coerce(delim, char *))
 #define append(str, to_append_)                                                         \

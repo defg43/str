@@ -379,6 +379,34 @@ array(string) tokenizeString(char *input, char *delim) {
     return ret;
 }
 
+array(string) tokenizePairwiseString(char *input, char *start_delimiter, char *end_delimiter) {
+    if (!input || !start_delimiter || !end_delimiter) {
+        return (array(string)) { .element = NULL, .count = 0 };
+    }
+    size_t input_index = 0, start_delimiter_index = 0, end_delimiter_index = 0, token_start = 0;
+    bool start_delimiter_matches = true, end_delimiter_matches = true;
+    string token = {};
+    array(string) ret = {};
+    while (input[input_index]) {
+        start_delimiter_matches = input[input_index] == start_delimiter[start_delimiter_index];
+        end_delimiter_matches = input[input_index] == end_delimiter[end_delimiter_index];
+        start_delimiter_index += start_delimiter_matches;
+        end_delimiter_index += end_delimiter_matches;
+        if (!start_delimiter[start_delimiter_index] && !end_delimiter[end_delimiter_index]) {
+            token = sliceFromCharPtr(input, token_start, input_index);
+            token_start = input_index;
+            push(ret, token);
+        }
+        input_index++;
+    }
+
+    if (token_start < input_index) {
+        token = sliceFromCharPtr(input, token_start, input_index);
+        push(ret, token);
+    }
+
+    return ret;
+}
 
 string stringGrowBuffer(string orig, size_t to_add) {
     if(orig.data == NULL) {
