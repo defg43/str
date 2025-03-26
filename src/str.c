@@ -348,7 +348,7 @@ array(string) tokenizeString_old(string input, string delimiter) {
     return ret;
 }
 
-array(string) tokenizeString(char *input, char *delim) {
+static array(string) tokenizeString(char *input, char *delim) {
     if (!input || !delim) {
         return (array(string)) { .element = NULL, .count = 0 };
     }
@@ -379,7 +379,7 @@ array(string) tokenizeString(char *input, char *delim) {
     return ret;
 }
 
-array(string) tokenizePairwiseString(char *input, char *start_delimiter, char *end_delimiter) {
+static array(string) tokenizePairwiseString(char *input, char *start_delimiter, char *end_delimiter) {
     if (!input || !start_delimiter || !end_delimiter) {
         return (array(string)) { .element = NULL, .count = 0 };
     }
