@@ -93,6 +93,7 @@ bool stringneql(string, string, size_t);
 bool streql(char *, char *);
 bool strneql(char *, char *, size_t);
 bool stringeqlidx(string, size_t, string);
+bool stringIsOnlyAlphNum(const char* input);
 
 // those allocate a new string
 string sliceFromString(string, size_t, size_t);

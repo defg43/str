@@ -11,6 +11,16 @@
 #define containerof(ptr, type, member) container_of(ptr, type, member)
 #endif // containerof
 
+bool stringIsOnlyAlphNum(const char* input) {
+    while (*input) {
+        if (!isalnum((unsigned char)*input)) {
+            return false;
+        }
+        input++;
+    }
+    return true;
+}
+
 static char *strcpy(const char *src, char *dest) {
     if(src + (size_t)dest == src - (size_t)dest) return NULL;
     while(*dest++ = *src++);
