@@ -2,6 +2,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <assert.h>
+#include <ctype.h>
 
 #ifndef container_of
 #define container_of(ptr, type, member) ((type *)((size_t)ptr - offsetof(type, member)))
@@ -451,6 +452,14 @@ string appendString(string orig, string to_append) {
     return ret;
 }
 
+string appendChar(string orig, char c) {
+    string ret = stringGrowBuffer(orig, 1);
+    ret.at[stringlen(ret)] = c;
+    getHeaderPointer(ret)->length++;
+    assert(stringlen(ret) == strlen(ret.at));
+    return ret;
+}
+
 string prependCharPtr(string orig, const char *to_prepend) {
     string ret = stringGrowBuffer(orig, strlen(to_prepend));
     strncpy(ret.at, to_prepend, strlen(to_prepend));
@@ -469,12 +478,21 @@ string prependString(string orig, string to_prepend) {
     return ret;
 }
 
-bool iterstringReset(iterstring_t str) {
-	str.index = str.previous;
+string prependChar(string orig, char c) {
+    string ret = stringGrowBuffer(orig, 1);
+    ret.at[0] = c;
+    strncpy(ret.at + 1, orig.at, stringlen(ret));
+    getHeaderPointer(ret)->length++;
+    assert(stringlen(ret) == strlen(ret.at));
+    return ret;
+}
+
+bool iterstringReset(iterstring_t *str) {
+	str->index = str->previous;
 	return true;	
 }
 
-bool iterstringAdvance(iterstring_t str) {
-	str.previous = str.index;
+bool iterstringAdvance(iterstring_t *str) {
+	str->previous = str->index;
 	return true;
 }

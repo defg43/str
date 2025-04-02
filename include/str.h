@@ -107,11 +107,13 @@ string stringReverse(string);
 string stringGrowBuffer(string, size_t);
 string appendCharPtr(string, const char *);
 string appendString(string, string);
+string appendChar(string orig, char c);
 string prependCharPtr(string, const char *);
-string prepend(string, string);
+string prependString(string, string);
+string prependChar(string orig, char c);
 
-bool iterstringReset(iterstring_t str);
-bool iterstringAdvance(iterstring_t str);
+bool iterstringReset(iterstring_t *str);
+bool iterstringAdvance(iterstring_t *str);
 
 // string stringUppercase(string);
 // string stringUppercaseRange(string, size_t, size_t);
